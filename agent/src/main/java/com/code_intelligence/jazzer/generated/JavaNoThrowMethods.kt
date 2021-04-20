@@ -15,7 +15,7 @@
 package com.code_intelligence.jazzer.generated
 
 private object JavaNoThrowMethods {
-    val dataFilePath: String = JavaNoThrowMethods.javaClass.packageName.replace('.', '/')
+    val dataFilePath: String = JavaNoThrowMethods.javaClass.getPackage().getName().replace('.', '/')
     const val dataFileName = "java_no_throw_methods_list.dat"
 
     fun readJavaNoThrowMethods(): Set<String> {
