@@ -82,6 +82,15 @@ def jazzer_dependencies():
 
     maybe(
         http_archive,
+        build_file = "@jazzer//third_party:native_utils.BUILD",
+        name = "com_github_adamheinrich_native_utils",
+        sha256 = "6013c0988ba40600e238e47088580fd562dcecd4afd3fcf26130efe7cb1620de",
+        strip_prefix = "native-utils-e6a39489662846a77504634b6fafa4995ede3b1d",
+        url = "https://github.com/adamheinrich/native-utils/archive/e6a39489662846a77504634b6fafa4995ede3b1d.tar.gz",
+    )
+
+    maybe(
+        http_archive,
         name = "com_github_johnynek_bazel_jar_jar",
         sha256 = "97c5f862482a05f385bd8f9d28a9bbf684b0cf3fae93112ee96f3fb04d34b193",
         strip_prefix = "bazel_jar_jar-171f268569384c57c19474b04aebe574d85fde0d",

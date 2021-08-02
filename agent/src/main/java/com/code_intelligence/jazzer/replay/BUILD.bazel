@@ -1,0 +1,30 @@
+load("//bazel:cc.bzl", "cc_shared_library")
+
+cc_shared_library(
+    name = "native",
+    srcs = [
+        "com_code_intelligence_jazzer_replay_Replayer.cpp",
+        "com_code_intelligence_jazzer_replay_Replayer.h",
+    ],
+    visibility = [
+        "//agent/src/main/java/com/code_intelligence/jazzer/replay:__pkg__",
+    ],
+    deps = [
+        "//driver:fuzzed_data_provider",
+        "@bazel_tools//tools/jdk:jni",
+    ],
+)
+
+java_binary(
+    name = "Replayer",
+    srcs = ["Replayer.java"],
+    resources = [
+        ":libnative.so",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//agent/src/main/java/com/code_intelligence/jazzer/api",
+        "//agent/src/main/java/com/code_intelligence/jazzer/runtime:fuzzed_data_provider",
+        "@com_github_adamheinrich_native_utils//:native_utils",
+    ],
+)
