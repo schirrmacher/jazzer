@@ -11,6 +11,11 @@ build:ci --features=layering_check
 build --java_language_version=8
 build --tool_java_language_version=9
 
+# CI toolchain
+build:ci --incompatible_enable_cc_toolchain_resolution
+build:ci --extra_toolchains=@llvm_toolchain//:cc-toolchain-linux,@llvm_toolchain//:cc-toolchain-darwin
+build:ci --//third_party:toolchain
+
 # RBE
 build:ci --bes_results_url=https://app.buildbuddy.io/invocation/
 build:ci --bes_backend=grpcs://cloud.buildbuddy.io
