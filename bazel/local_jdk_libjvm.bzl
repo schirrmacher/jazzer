@@ -13,14 +13,23 @@
 # limitations under the License.
 
 def _find_recursively_under_path(repository_ctx, path, basename):
-    result = repository_ctx.execute([
-        repository_ctx.which("sh"),
-        "-c",
-        """find -L "{path}" -name "{basename}" | head -1""".format(
-            path = path,
-            basename = basename,
-        ),
-    ])
+    if "windows" in repository_ctx.os.name.lower():
+        win_path = path.replace("/", "\\")
+        result = repository_ctx.execute([
+            "where",
+            "/r",
+            win_path,
+            basename,
+        ])
+    else:
+        result = repository_ctx.execute([
+            repository_ctx.which("sh"),
+            "-c",
+            """find -L "{path}" -name "{basename}" | head -1""".format(
+                path = path,
+                basename = basename,
+            ),
+        ])
     if result.return_code != 0:
         return None
     file_path = result.stdout.strip()
@@ -29,13 +38,14 @@ def _find_recursively_under_path(repository_ctx, path, basename):
     return repository_ctx.path(file_path)
 
 LIBJVM_NAMES = [
+    "jvm.lib",
     "libjvm.dylib",
     "libjvm.so",
 ]
 
 def _local_jdk_libjvm(repository_ctx):
-    java_binary = str(repository_ctx.path(Label("@local_jdk//:bin/java")))
-    java_home = str(repository_ctx.path(java_binary + "/../../"))
+    # Use a file as the anchor that exists on Windows, Linux, and macOS across JDK versions.
+    java_home = str(repository_ctx.path(Label("@local_jdk//:release")).dirname)
 
     libjvm_path = None
     for libjvm_name in LIBJVM_NAMES:
@@ -45,7 +55,17 @@ def _local_jdk_libjvm(repository_ctx):
 
     if libjvm_path != None:
         repository_ctx.symlink(libjvm_path, libjvm_path.basename)
-        build_content = """
+        if libjvm_path.basename.endswith(".lib"):
+            build_content = """
+cc_import(
+    name = "libjvm",
+    interface_library = "{libjvm}",
+    system_provided = True,
+    visibility = ["//visibility:public"],
+)
+""".format(libjvm = libjvm_path.basename)
+        else:
+            build_content = """
 cc_import(
     name = "libjvm",
     shared_library = "{libjvm}",
