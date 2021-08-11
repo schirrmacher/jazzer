@@ -28,7 +28,11 @@ void JNICALL handleInterrupt(JNIEnv, jclass) {
   static std::atomic<bool> already_exiting{false};
   if (!already_exiting.exchange(true)) {
     // Let libFuzzer exit gracefully when the JVM received SIGINT.
+#ifdef _WIN32
+    raise(SIGTERM);
+#else
     raise(SIGUSR1);
+#endif
   } else {
     // Exit libFuzzer forcefully on repeated SIGINTs.
     raise(SIGTERM);
