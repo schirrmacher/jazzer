@@ -14,7 +14,9 @@
 
 #include "libfuzzer_driver.h"
 
+#ifndef _WIN32
 #include <dlfcn.h>
+#endif
 
 #include <algorithm>
 #include <filesystem>
@@ -51,11 +53,13 @@ DECLARE_string(coverage_report);
 extern "C" [[maybe_unused]] void __jazzer_set_death_callback(
     void (*callback)()) {
   jazzer::AbstractLibfuzzerDriver::libfuzzer_print_crashing_input_ = callback;
+#ifndef _WIN32
   void *sanitizer_set_death_callback =
       dlsym(RTLD_DEFAULT, "__sanitizer_set_death_callback");
   if (sanitizer_set_death_callback != nullptr)
     reinterpret_cast<void (*)(void (*)())>(sanitizer_set_death_callback)(
         callback);
+#endif
 }
 
 // Suppress libFuzzer warnings about missing sanitizer methods in non-ASan
