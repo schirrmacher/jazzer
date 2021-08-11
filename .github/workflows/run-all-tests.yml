@@ -41,6 +41,10 @@ jobs:
           path: ${{ matrix.cache }}
           key: bazel-disk-cache-${{ matrix.arch }}-${{ matrix.jdk }}
 
+      - name: Install LLVM on Windows
+        if: matrix.arch == 'windows'
+        run: choco install -y llvm
+
       - name: Build
         run: bazelisk build --config=ci --remote_header=x-buildbuddy-api-key=${{ secrets.BUILDBUDDY_API_KEY }} --disk_cache=${{ matrix.cache }} --java_runtime_version=localjdk_${{ matrix.jdk }} //...
 
