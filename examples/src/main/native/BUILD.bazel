@@ -27,6 +27,11 @@ cc_shared_library(
         # Workaround for https://github.com/bazelbuild/bazel/issues/11122.
         "-fno-sanitize=vptr,function",
     ],
+    target_compatible_with = select({
+        "@platforms//os:osx": [],
+        "@platforms//os:linux": [],
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+    }),
     visibility = ["//examples:__pkg__"],
     deps = [
         "@bazel_tools//tools/jdk:jni",
